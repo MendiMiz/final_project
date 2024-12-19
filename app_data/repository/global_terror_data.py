@@ -1,7 +1,8 @@
 import csv
 
 from app_data.db.psql.models import Country, Region, ProvState, City, Event, Location
-from app_data.repository.event_repository import insert_model, insert_location, insert_city
+from app_data.repository.event_repository import insert_model, insert_location, insert_city, insert_country, \
+    insert_region
 
 csv_path = "C:/Users/INTERNET/PycharmProjects/Global_Terror_Radar/data/globalterrorismdb_0718dist-1000rows.csv"
 
@@ -12,8 +13,8 @@ def get_date(attack):
 
 def get_location(attack):
     return {"country": attack.get("country_txt", ""), "region": attack.get("region_txt", ""),
-            "provstate": attack.get("provstate", ""), "city": attack.get("city_txt", ""),
-            "lat": attack.get("latitude", ""), "lon": attack.get("longitude", "")}
+            "provstate": attack.get("provstate", ""), "city": attack.get("city", ""),
+            "lat": attack.get("latitude", None), "lon": attack.get("longitude", None)}
 
 
 def get_victims_n(attack):
@@ -46,9 +47,8 @@ def attacks_from_csv():
 
 def insert_to_location(attack):
     locations_details = get_location(attack)
-
-    country_id = insert_model(Country(country_name=locations_details["country"]))
-    region_id = insert_model(Region(region_name=locations_details["region"]))
+    country_id = insert_country(Country(country_name=locations_details["country"]))
+    region_id = insert_region(Region(region_name=locations_details["region"]))
     prov_state_id = insert_model(ProvState(prov_state_name=locations_details["provstate"]))
     city_id = insert_city(City(city_name=locations_details["city"],
                  lat= locations_details["lat"], lon= locations_details["lon"]))

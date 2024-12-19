@@ -1,5 +1,5 @@
 from app_data.db.psql.database import session_maker
-from app_data.db.psql.models import Event, Location, City
+from app_data.db.psql.models import Event, Location, City, Country, Region
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -31,9 +31,12 @@ def insert_location(location):
 
 def insert_city(city):
     with session_maker() as session:
-        location_existing = session.query(City).filter(City.lat == city.lat).first()
-        if location_existing:
-            return city.id
+        if city.lat:
+            city_existing = session.query(City).filter(City.lat == city.lat).first()
+        else:
+            city_existing = session.query(City).filter(City.city_name == city.city_name).first()
+        if city_existing:
+          return city_existing.id
         else:
             try:
                 session.add(city)
@@ -44,4 +47,32 @@ def insert_city(city):
                 session.rollback()
                 print("Failed to insert: " + str(e))
 
+def insert_country(country):
+    with session_maker() as session:
+        country_existing = session.query(Country).filter(Country.country_name == country.country_name).first()
+        if country_existing:
+          return country_existing.id
+        else:
+            try:
+                session.add(country)
+                session.commit()
+                session.refresh(country)
+                return country.id
+            except SQLAlchemyError as e:
+                session.rollback()
+                print("Failed to insert: " + str(e))
 
+def insert_region(region):
+    with session_maker() as session:
+        region_existing = session.query(Region).filter(Region.region_name == region.region_name).first()
+        if region_existing:
+          return region_existing.id
+        else:
+            try:
+                session.add(region)
+                session.commit()
+                session.refresh(region)
+                return region.id
+            except SQLAlchemyError as e:
+                session.rollback()
+                print("Failed to insert: " + str(e))
