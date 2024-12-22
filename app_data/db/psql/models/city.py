@@ -6,7 +6,7 @@ class City(Base):
     __tablename__ = 'cities'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    city_name =  Column(String(100), nullable=False)
+    city_name =  Column(String(100), nullable=True)
     lat = Column(Float, nullable=True)
     lon = Column(Float, nullable=True)
 

@@ -9,11 +9,11 @@ from app_data.db.psql.models import Country, Region, ProvState, City, Event, Loc
 from app_data.db.psql.models.attack_type import AttackType
 from app_data.db.psql.models.attack_type_event import AttackTypeEvent
 from app_data.repository.event_repository import insert_model, insert_location, insert_city, \
-     insert_event_group, insert_target_type_event, \
-    insert_attack_type_event, insert_entities_bulk
+    insert_event_group, insert_target_type_event, \
+    insert_attack_type_event, insert_entities_bulk, insert_cities_bulk, insert_event
 
 # Define the path to the CSV file
-csv_path = "C:/Users/INTERNET/PycharmProjects/Global_Terror_Radar/data/globalterrorismdb_0718dist-1000rows.csv"
+csv_path = "C:/Users/INTERNET/PycharmProjects/Global_Terror_Radar/data/globalterrorismdb_0718dist.csv"
 
 
 # Safe conversion functions
@@ -33,10 +33,10 @@ def safe_float(value):
 
 # Function to normalize the data into a pandas DataFrame
 def normalize_data_to_dataframe(csv_path):
-    # Load the CSV into a pandas DataFrame
-    df = pd.read_csv(csv_path, encoding='iso-8859-1')
+    # Load the CSV into a pandas DataFrame with low_memory=False
+    df = pd.read_csv(csv_path, encoding='iso-8859-1', low_memory=False)
 
-    # Select and rename relevant columns
+    # Create a copy of the DataFrame to avoid the chained assignment warning
     normalized_df = pd.DataFrame({
         "year": df["iyear"].apply(safe_int),
         "month": df["imonth"].apply(safe_int),
@@ -44,7 +44,7 @@ def normalize_data_to_dataframe(csv_path):
         "country": df["country_txt"],
         "region": df["region_txt"],
         "prov_state": df["provstate"],
-        "city": df["city"],
+        "city": df["city"].fillna("unknown"),  # Changed to avoid inplace warning
         "latitude": df["latitude"].apply(safe_float),
         "longitude": df["longitude"].apply(safe_float),
         "killed": df["nkill"].apply(safe_int),
@@ -62,7 +62,6 @@ def normalize_data_to_dataframe(csv_path):
     })
 
     normalized_df = normalized_df.replace({np.nan: None})
-
     return normalized_df
 
 def insert_from_dataframe(df):
@@ -85,21 +84,21 @@ def insert_from_dataframe(df):
     attack_types = set(df["attack_type1"].dropna().tolist() + df["attack_type2"].dropna().tolist() + df["attack_type3"].dropna().tolist())
     attack_types_ids_dict = insert_entities_bulk(AttackType, attack_types, "attack_type_name")
 
+    unique_cities = df[["city", "latitude", "longitude"]].drop_duplicates()
+    city_list = [
+        {"city_name": row["city"], "lat": row["latitude"], "lon": row["longitude"]}
+        for _, row in unique_cities.iterrows()
+    ]
+    city_ids_dict = insert_cities_bulk(city_list)
+
     for _, row in df.iterrows():
 
 
         country_id = countries_ids_dict[row["country"]]
         region_id = region_ids_dict[row["region"]]
         prov_state_id = prov_state_ids_dict[row["prov_state"]]
+        city_id = city_ids_dict[row["city"]]
 
-        # Insert city
-        city_id = insert_city(
-            City(
-                city_name=row["city"],
-                lat=row["latitude"],
-                lon=row["longitude"]
-            )
-        )
 
         # Insert location
         location_id = insert_location(
@@ -112,7 +111,7 @@ def insert_from_dataframe(df):
         )
 
         # Insert event
-        event_id = insert_model(
+        event_id = insert_event(
             Event(
                 location_id=location_id,
                 killed=row["killed"],

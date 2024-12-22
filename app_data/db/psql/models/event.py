@@ -16,6 +16,6 @@ class Event(Base):
     def __repr__(self):
         return (
             f"<Event(id={self.id}, location_id={self.location_id}, killed={self.killed}, injured={self.injured}, "
-            f"terrorist_num={self.terrorist_num}, year={self.year}, month={self.month}, day={self.day})>"
+            f"terrorist_num={self.terrorists_count}, year={self.year}, month={self.month}, day={self.day})>"
         )
 

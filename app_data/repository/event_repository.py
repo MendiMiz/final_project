@@ -6,6 +6,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from app_data.db.psql.models.attack_type import AttackType
 from app_data.db.psql.models.attack_type_event import AttackTypeEvent
 
+def get_all_countries_from_db():
+    with session_maker() as session:
+        countries = session.query(Country).all()
+        countries_names = [country.country_name for country in countries]
+        return countries_names
 
 def insert_model(model):
     with session_maker() as session:
@@ -163,4 +168,79 @@ def insert_entities_bulk(entity_class, entity_names, key_column):
             print(f"Failed to insert {entity_class.__name__} entities in bulk: {str(e)}")
 
     return entity_dict
+
+
+def insert_cities_bulk(cities):
+    """
+    Inserts unique cities into the database in bulk.
+
+    Args:
+        cities: A list of dictionaries with city_name, lat, and lon keys.
+
+    Returns:
+        A dictionary mapping city names to their IDs.
+    """
+    city_dict = {}
+
+    with session_maker() as session:
+        # Fetch existing cities from the database (including lat, lon for comparison)
+        existing_cities = session.query(City.city_name, City.lat, City.lon, City.id).all()
+        existing_city_names = {
+            (city_name, lat, lon): city_id
+            for city_name, lat, lon, city_id in existing_cities
+        }
+
+        # Filter out cities that already exist based on city_name, lat, and lon
+        cities_to_insert = [
+            city for city in cities
+            if (city["city_name"], city["lat"], city["lon"]) not in existing_city_names
+        ]
+
+        # Bulk insert new cities
+        if cities_to_insert:
+            try:
+                session.add_all([
+                    City(city_name=city["city_name"], lat=city["lat"], lon=city["lon"])
+                    for city in cities_to_insert
+                ])
+                session.commit()
+
+                # Refresh to get IDs of newly inserted cities
+                for city in cities_to_insert:
+                    city_id = session.query(City).filter_by(city_name=city["city_name"], lat=city["lat"], lon=city["lon"]).first().id
+                    city_dict[city["city_name"]] = city_id
+            except SQLAlchemyError as e:
+                session.rollback()
+                print(f"Failed to insert cities in bulk: {e}")
+
+        # Add existing cities to the dictionary
+        for (city_name, lat, lon), city_id in existing_city_names.items():
+            city_dict[city_name] = city_id
+
+    return city_dict
+
+
+
+def insert_event(event):
+    """
+    Inserts an event into the database if it does not already exist.
+
+    Args:
+        event (Event): The Event object to insert.
+
+    Returns:
+        int: The ID of the existing or newly inserted event.
+    """
+    with session_maker() as session:
+        try:
+            session.add(event)
+            session.commit()
+            session.refresh(event)
+            print(f"Inserted new event with ID: {event.id}")
+            return event.id
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            print(f"Failed to insert event: {str(e)}")
+
 

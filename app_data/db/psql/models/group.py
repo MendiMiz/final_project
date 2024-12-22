@@ -6,7 +6,7 @@ class Group(Base):
     __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(255), nullable=False)
 
     def __repr__(self):
         return (
