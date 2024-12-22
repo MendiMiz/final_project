@@ -13,3 +13,4 @@ class EventGroup(Base):
         return (
             f"<EventGroup(id={self.id}, event_id={self.event_id}, group_id={self.group_id})>"
         )
+

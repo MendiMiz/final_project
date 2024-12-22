@@ -8,7 +8,7 @@ class Event(Base):
     location_id = Column(Integer, ForeignKey('locations.id'))
     killed = Column(Integer)
     injured = Column(Integer)
-    terrorist_num = Column(Integer)
+    terrorists_count = Column(Integer, nullable=True)
     year = Column(Integer)
     month = Column(Integer)
     day = Column(Integer)
@@ -18,3 +18,4 @@ class Event(Base):
             f"<Event(id={self.id}, location_id={self.location_id}, killed={self.killed}, injured={self.injured}, "
             f"terrorist_num={self.terrorist_num}, year={self.year}, month={self.month}, day={self.day})>"
         )
+

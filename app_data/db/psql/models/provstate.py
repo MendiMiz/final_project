@@ -6,7 +6,7 @@ class ProvState(Base):
     __tablename__ = 'prov_states'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    prov_state_name =  Column(String(100), nullable=False)
+    prov_state_name =  Column(String(100), nullable=True)
 
 
 

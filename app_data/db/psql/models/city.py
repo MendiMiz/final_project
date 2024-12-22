@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from app_data.db.psql.models import Base
 
 
@@ -9,7 +9,6 @@ class City(Base):
     city_name =  Column(String(100), nullable=False)
     lat = Column(Float, nullable=True)
     lon = Column(Float, nullable=True)
-
 
     def __repr__(self):
         return (

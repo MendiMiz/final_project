@@ -12,3 +12,4 @@ class Group(Base):
         return (
             f"<Group(id={self.id}, course_name='{self.name}')>"
         )
+

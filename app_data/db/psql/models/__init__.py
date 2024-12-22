@@ -12,3 +12,5 @@ from .provstate import ProvState
 from .region import Region
 from .target_type import TargetType
 from .target_type_event import TargetTypeEvent
+from .attack_type import AttackType
+from .attack_type_event import AttackTypeEvent
