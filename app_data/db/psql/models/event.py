@@ -5,7 +5,7 @@ class Event(Base):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
-    location_id = Column(Integer, ForeignKey('locations.id'))
+    location_id = Column(Integer, ForeignKey('locations.id'), nullable=True)
     killed = Column(Integer)
     injured = Column(Integer)
     terrorists_count = Column(Integer, nullable=True)

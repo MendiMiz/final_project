@@ -292,3 +292,108 @@ def create_terror_group_map(data, region_coords):
     return m._repr_html_()
 
 
+def create_map_most_attacked_targets(data, location_coords, mode="region"):
+    """
+    Creates a folium map for visualizing terrorist activity data based on regions or countries.
+
+    Parameters:
+    - data: List of dictionaries containing "region" or "country", "target_type_name", and "groups_involved".
+    - location_coords: Dictionary mapping regions or countries to their coordinates.
+    - mode: "region" or "country" to specify the level of visualization.
+    """
+    print(f"Preparing the HTML map for {mode}-level terrorist activity...")
+
+    # Initialize the map
+    m = folium.Map(location=[20, 0], zoom_start=2)
+
+    # Define a function to determine marker color based on the number of groups
+    def get_color(num_groups):
+        if num_groups < 10:
+            return 'blue'  # Few groups
+        elif num_groups < 30:
+            return 'green'  # Moderate groups
+        elif num_groups < 50:
+            return 'orange'  # Many groups
+        return 'red'  # Very high groups
+
+    # Iterate over each location in the data
+    for entry in data:
+        location_name = entry[mode]
+        target_type = entry['target_type_name']
+        groups_involved = entry['groups_involved']
+        num_groups = len(groups_involved)
+
+        # Build popup content
+        popup_content = f"<b>{location_name}</b><br>"
+        popup_content += f"<b>Target Type:</b> {target_type}<br>"
+        popup_content += f"<b>Groups Involved:</b> {num_groups}<br>"
+        popup_content += "<ul>"
+        for group in groups_involved:
+            popup_content += f"<li>{group}</li>"
+        popup_content += "</ul>"
+
+        # Get coordinates for the location
+        coords = location_coords.get(location_name, (None, None))
+
+        # Add marker if coordinates are valid
+        if coords != (None, None):
+            folium.Marker(
+                location=coords,
+                icon=folium.Icon(color=get_color(num_groups), icon='info-sign'),
+                popup=folium.Popup(popup_content, max_width=300, max_height=300)
+            ).add_to(m)
+
+    return m._repr_html_()
+
+
+def create_map_terror_groups_x_region(data, location_coords, mode="region"):
+    """
+    Creates a folium map for visualizing terrorist activity data based on regions or countries.
+
+    Parameters:
+    - data: List of dictionaries containing "region" or "country", "target_type_name", and "groups_involved".
+    - location_coords: Dictionary mapping regions or countries to their coordinates.
+    - mode: "region" or "country" to specify the level of visualization.
+    """
+    print(f"Preparing the HTML map for {mode}-level terrorist activity...")
+
+    # Initialize the map
+    m = folium.Map(location=[20, 0], zoom_start=2)
+
+    # Define a function to determine marker color based on the number of groups
+    def get_color(num_groups):
+        if num_groups < 10:
+            return 'blue'  # Few groups
+        elif num_groups < 30:
+            return 'green'  # Moderate groups
+        elif num_groups < 50:
+            return 'orange'  # Many groups
+        return 'red'  # Very high groups
+
+    # Iterate over each location in the data
+    for entry in data:
+        location_name = entry["location_name"]
+        group_count = entry["group_count"]
+        group_names = entry["group_names"]
+        num_groups = len(group_names)
+
+        # Build popup content
+        popup_content = f"<b>{location_name}</b><br>"
+        popup_content += f"<b>Group Count:</b> {group_count}<br>"
+        popup_content += "<ul>"
+        for group in group_names:
+            popup_content += f"<li>{group}</li>"
+        popup_content += "</ul>"
+
+        # Get coordinates for the location
+        coords = location_coords.get(location_name, (None, None))
+
+        # Add marker if coordinates are valid
+        if coords != (None, None):
+            folium.Marker(
+                location=coords,
+                icon=folium.Icon(color=get_color(num_groups), icon='info-sign'),
+                popup=folium.Popup(popup_content, max_width=300, max_height=300)
+            ).add_to(m)
+
+    return m._repr_html_()

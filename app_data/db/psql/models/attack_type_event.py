@@ -6,8 +6,8 @@ class AttackTypeEvent(Base):
     __tablename__ = 'attack_type_event'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    event_id = Column(Integer, ForeignKey('events.id'))
-    attack_type_id = Column(Integer, ForeignKey('attack_types.id'))
+    event_id = Column(Integer, ForeignKey('events.id'), nullable=True)
+    attack_type_id = Column(Integer, ForeignKey('attack_types.id'), nullable=True)
 
 
     def __repr__(self):

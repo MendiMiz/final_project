@@ -5,9 +5,9 @@ from app_data.db.psql.models import Base
 class EventGroup(Base):
     __tablename__ = 'event-group'
 
-    id = Column(Integer, primary_key=True)
-    event_id = Column(Integer, ForeignKey('events.id'))
-    group_id = Column(Integer, ForeignKey('groups.id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    event_id = Column(Integer, ForeignKey('events.id'), nullable=True)
+    group_id = Column(Integer, ForeignKey('groups.id'), nullable=True)
 
     def __repr__(self):
         return (

@@ -1,27 +1,22 @@
-from datetime import datetime
 from flask import Blueprint, send_file, request, Response, jsonify
 
-from app_data.repository.queries import get_deadliest_attack_types, get_top_terror_groups, \
+from app_data.repository.queries1 import get_deadliest_attack_types, get_top_terror_groups, \
     get_most_active_groups_by_area, get_avg_victims_per_attack_by_region_try_map, \
     get_avg_victims_per_attack_by_country_try_map, get_percentage_change_in_attacks_by_region, \
-    get_top5_terror_groups_by_region
+    get_top5_terror_groups_by_region, get_top_5_active_groups_by_country
 
 statistics_bp = Blueprint('statistics', __name__)
 
 
 @statistics_bp.route('/avg_victims_by_region/<string:mode>', methods=['GET'])
 def avg_victims_by_region(mode):
-    # Fetch the data from the function
     data = get_avg_victims_per_attack_by_region_try_map(mode)
-    # Return the data as JSON response
     return jsonify(data), 200
 
 
 @statistics_bp.route('/avg_victims_by_country/<string:mode>', methods=['GET'])
 def avg_victims_by_country(mode):
-    # Fetch the data from the function
     data = get_avg_victims_per_attack_by_country_try_map(mode)
-    # Return the data as JSON response
     return jsonify(data), 200
 
 
@@ -90,14 +85,13 @@ def top_terror_groups():
 
 @statistics_bp.route('/active_groups_by_area', methods=['GET'])
 def active_groups_by_area():
-    area_id = request.args.get('area_id')  # Get area_id from query parameter
+    area_id = request.args.get('area_id')
     if not area_id:
         return jsonify({"error": "area_id is required"}), 400
 
     try:
         active_groups = get_most_active_groups_by_area(area_id)
 
-        # Return the result as a JSON response
         return jsonify(active_groups), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -105,8 +99,6 @@ def active_groups_by_area():
 
 @statistics_bp.route('/top_5_active_groups_by_country', methods=['GET'])
 def top_5_active_groups_by_country():
-    # Fetch the top 5 groups for each country
     top_groups = get_top_5_active_groups_by_country()
 
-    # Return the top groups data as JSON
     return jsonify(top_groups), 200

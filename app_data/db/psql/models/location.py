@@ -6,10 +6,10 @@ class Location(Base):
     __tablename__ = 'locations'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    country_id = Column(Integer, ForeignKey('countries.id'))
-    region_id = Column(Integer, ForeignKey('regions.id'))
-    prov_state_id = Column(Integer, ForeignKey('prov_states.id'))
-    city_id = Column(Integer, ForeignKey('cities.id'))
+    country_id = Column(Integer, ForeignKey('countries.id'), nullable=True)
+    region_id = Column(Integer, ForeignKey('regions.id'), nullable=True)
+    prov_state_id = Column(Integer, ForeignKey('prov_states.id'), nullable=True)
+    city_id = Column(Integer, ForeignKey('cities.id'), nullable=True)
 
 
     def __repr__(self):

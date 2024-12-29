@@ -1,9 +1,9 @@
-from flask import Blueprint, send_file, request, Response, jsonify
+from flask import Blueprint, jsonify
 
-from front_app.api.statistics_1_api import fetch_victims_data_by_region, fetch_victims_data_by_country, \
+from front_app.api.statistics_1_api import fetch_victims_data_by_region, \
     fetch_region_attacks_percentage_changes_over_years, fetch_top_terror_groups_x_region
-from front_app.service.maps_service import create_map, country_coordinates, region_coordinates, \
-    create_map_changes_over_year, create_terror_group_map
+from front_app.service.maps_service1 import create_map, country_coordinates, region_coordinates, \
+    create_map_changes_over_year, create_terror_group_map, create_map_most_attacked_targets
 
 statistics_maps_bp = Blueprint('statistics_maps', __name__)
 
@@ -36,3 +36,4 @@ def top5_terror_groups_x_region():
 
     except Exception as e:
         return jsonify({'message': str(e)}), 500
+
