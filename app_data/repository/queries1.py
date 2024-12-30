@@ -1,4 +1,6 @@
 from collections import defaultdict
+from typing import List, Dict
+
 from app_data.db.psql.database import session_maker
 from app_data.db.psql.models import TargetType, Event, TargetTypeEvent, Region, Location, AttackType, AttackTypeEvent, \
     Country, Group, EventGroup
@@ -23,7 +25,6 @@ def get_top5_terror_groups_by_region():
 
         results = query.all()
 
-        # Create a dictionary to hold regions and their terror groups
         region_terror_groups = defaultdict(list)
 
         for row in results:
@@ -117,12 +118,6 @@ def get_deadliest_attack_types():
 
     return results
 
-# deadliest_attack_types = get_deadliest_attack_types()
-# print(deadliest_attack_types[0:5])
-# for attack_type, total_points in deadliest_attack_types:
-#     print(f"Attack Type: {attack_type}, Total Points: {total_points}")
-
-
 
 
 def get_avg_victims_per_attack_by_region_try_map(mode="all"):
@@ -148,7 +143,11 @@ def get_avg_victims_per_attack_by_region_try_map(mode="all"):
     return ordered_results
 
 
-def get_avg_victims_per_attack_by_country_try_map(mode="all"):
+def get_avg_victims_per_country(mode: str = "all") -> List[Dict[str, float]]:
+
+    if mode not in ["all", "top"]:
+        raise ValueError("Invalid mode. Expected 'all' or 'top'.")
+
     with session_maker() as session:
         query = (
             session.query(
@@ -157,17 +156,22 @@ def get_avg_victims_per_attack_by_country_try_map(mode="all"):
             )
             .join(Location, Location.country_id == Country.id)
             .join(Event, Event.location_id == Location.id)
-            .group_by(Country.id)
+            .group_by(Country.country_name)
+            .having(func.avg((Event.killed * 2) + (Event.injured * 1)) != None)  # Exclude NULL values
             .order_by(func.avg((Event.killed * 2) + (Event.injured * 1)).desc())
         )
 
-        results = query.all()
-
-        ordered_results = [{'country': row.country_name, 'avg_victims': row.avg_victims} for row in results]
         if mode == "top":
-            ordered_results = get_top_n_by_value(ordered_results, "avg_victims", 5)
+            query = query.limit(5)
 
-        return ordered_results
+        try:
+            results = query.all()
+            print(results)
+        except Exception as e:
+            print(f"Database query failed: {e}")
+            return []
+
+        return [{'country': row.country_name, 'avg_victims': row.avg_victims} for row in results]
 
 
 def get_avg_victims_per_attack_by_region():
@@ -225,9 +229,6 @@ def get_avg_victims_by_region():
 
     return results
 
-# avg_victims_by_region = get_avg_victims_by_region()
-# for region_name, avg_victims in avg_victims_by_region:
-#     print(f"Region: {region_name}, Average Victims: {avg_victims}")
 
 
 def get_attack_target_correlation():
@@ -249,10 +250,6 @@ def get_attack_target_correlation():
 
     return results
 
-# attack_target_correlation = get_attack_target_correlation()
-# for attack_type, target_type, co_occurrence_count in attack_target_correlation:
-#     print(f"Attack Type: {attack_type}, Target Type: {target_type}, Co-occurrence Count: {co_occurrence_count}")
-
 
 
 def get_annual_attack_count():
@@ -271,10 +268,6 @@ def get_annual_attack_count():
     return results
 
 
-# annual_attack_counts = get_annual_attack_count()
-# for year, total_attacks in annual_attack_counts:
-#     print(f"Year: {year}, Total Attacks: {total_attacks}")
-
 
 def get_monthly_attack_count():
     with session_maker() as session:
@@ -292,9 +285,7 @@ def get_monthly_attack_count():
 
     return results
 
-# monthly_attack_counts = get_monthly_attack_count()
-# for year, month, total_attacks in monthly_attack_counts:
-#     print(f"Year: {year}, Month: {month}, Total Attacks: {total_attacks}")
+
 
 def get_most_active_groups_by_area(area_id):
     with session_maker() as session:
@@ -345,4 +336,5 @@ def get_top_5_active_groups_by_country():
             result[country_name] = result[country_name][1:6]
 
     return result
+
 

@@ -17,6 +17,9 @@ region_coordinates = {
 
 
 country_coordinates = {
+    'Sri Lanka (Ceylon)': (7.8731, 80.7718),
+    'South Vietnam': (10.8231, 106.6297),
+    'Barbados': (13.1939, -59.5432),
     'Serbia': (44.016521, 21.005859),
     'Brunei': (4.535277, 114.727669),
     'New Zealand': (-40.900557, 174.885971),

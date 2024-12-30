@@ -2,7 +2,7 @@ from flask import Blueprint, send_file, request, Response, jsonify
 
 from app_data.repository.queries1 import get_deadliest_attack_types, get_top_terror_groups, \
     get_most_active_groups_by_area, get_avg_victims_per_attack_by_region_try_map, \
-    get_avg_victims_per_attack_by_country_try_map, get_percentage_change_in_attacks_by_region, \
+    get_avg_victims_per_country, get_percentage_change_in_attacks_by_region, \
     get_top5_terror_groups_by_region, get_top_5_active_groups_by_country
 
 statistics_bp = Blueprint('statistics', __name__)
@@ -16,7 +16,7 @@ def avg_victims_by_region(mode):
 
 @statistics_bp.route('/avg_victims_by_country/<string:mode>', methods=['GET'])
 def avg_victims_by_country(mode):
-    data = get_avg_victims_per_attack_by_country_try_map(mode)
+    data = get_avg_victims_per_country(mode)
     return jsonify(data), 200
 
 

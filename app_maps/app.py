@@ -2,9 +2,9 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 
-from front_app.routes.principal_route import main_page_bp
-from front_app.routes.statistics_1_route import statistics_maps_bp
-from front_app.routes.statistics_2_route import statistics_maps_bp2
+from app_maps.routes.principal_route import main_page_bp
+from app_maps.routes.statistics_1_route import statistics_maps_bp
+from app_maps.routes.statistics_2_route import statistics_maps_bp2
 
 load_dotenv(verbose=True)
 

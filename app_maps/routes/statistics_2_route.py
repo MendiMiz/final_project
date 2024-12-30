@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify
 
-from front_app.api.statistics_2_api import fetch_region_or_country_most_attacked_target_type, \
+from app_maps.api.statistics_2_api import fetch_region_or_country_most_attacked_target_type, \
     fetch_terror_groups_by_all_locations
-from front_app.service.maps_service1 import country_coordinates, region_coordinates, \
+from app_maps.service.maps_service1 import country_coordinates, region_coordinates, \
     create_map_changes_over_year, create_terror_group_map, create_map_most_attacked_targets, \
     create_map_terror_groups_x_region
 

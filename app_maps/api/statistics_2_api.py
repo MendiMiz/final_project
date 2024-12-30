@@ -1,4 +1,4 @@
-from front_app.api.statistics_1_api import fetch_url
+from app_maps.api.statistics_1_api import fetch_url
 
 
 def fetch_region_or_country_most_attacked_target_type(mode):

@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify
 
-from front_app.api.statistics_1_api import fetch_victims_data_by_region, \
+from app_maps.api.statistics_1_api import fetch_victims_data_by_region, \
     fetch_region_attacks_percentage_changes_over_years, fetch_top_terror_groups_x_region
-from front_app.service.maps_service1 import create_map, country_coordinates, region_coordinates, \
+from app_maps.service.maps_service1 import create_map, country_coordinates, region_coordinates, \
     create_map_changes_over_year, create_terror_group_map, create_map_most_attacked_targets
 
 statistics_maps_bp = Blueprint('statistics_maps', __name__)
@@ -11,6 +11,7 @@ statistics_maps_bp = Blueprint('statistics_maps', __name__)
 def get_average_casualties_by_region_endpoint(location_type, mode):
     try:
         data = fetch_victims_data_by_region(location_type, mode)
+        print(data)
         html_map = create_map(data, country_coordinates, region_coordinates)
         return html_map
 
